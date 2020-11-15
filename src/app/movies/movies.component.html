@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="search">
+        <!-- <i class="fa fa-search icon"></i> -->
+        <input class="search-input" 
+            type="text"
+            #movieSearchInput 
+            placeholder="Search movies here..." />
+        <button (click)="getRandomMovie()" class="random-button">Random Movie</button>
+        <div class="movie-result" *ngIf="listOfMovieResult.length > 0">
+            <ul>
+                <li *ngFor="let movie of listOfMovieResult" class="result-item" (click)="selectMovie(movie.id); movieSearchInput.value = ''">
+                    <img src="https://image.tmdb.org/t/p/w200/{{movie.poster_path}}" alt="No Result">
+                    <span>{{movie.original_title}}</span>
+                    <p>{{movie.release_date}}</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="selected-movie" *ngIf="selectedMovie">
+        <img class="movie-poster" src="https://image.tmdb.org/t/p/original/{{selectedMovie.poster_path}}" alt="No Result">
+        <h1 class="movie-name">
+            {{selectedMovie.original_title}} <span>({{selectedMovie.release_date}})</span>
+        </h1>
+        <p class="movie-overview">{{selectedMovie.overview}}</p>
+    </div>
+</div>
