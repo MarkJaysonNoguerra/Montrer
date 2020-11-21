@@ -8,6 +8,7 @@ import {
   distinctUntilChanged,
   filter
 } from "rxjs/operators";
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-movies',
@@ -21,18 +22,20 @@ export class MoviesComponent implements OnInit {
   isSearching = false;
   latestMovie;
   selectedMovie;
+  moviecasts = [];
+  trailerSafeSource: SafeResourceUrl;
 
   constructor(
     private apiService : ApiService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private sanitizer: DomSanitizer
   ) { 
     this.isSearching = false;
     this.listOfMovieResult = [];
 
   }
 
-  ngOnInit(): void {
-    
+  ngOnInit(): void {    
     this.apiService.getLatestMovie().subscribe(data => {
         this.latestMovie = data;
         console.log(data);
@@ -49,31 +52,65 @@ export class MoviesComponent implements OnInit {
       distinctUntilChanged()
     ).subscribe((text) => {
       this.isSearching = true;
-      this.apiService.searchMovies(text).subscribe(res => {
+      this.apiService.searchMovies(text).subscribe((res: any) => {
         this.listOfMovieResult = res.results.slice(0, 5);
         console.log(this.listOfMovieResult);
         this.isSearching = false;
       }, (err) => {
         this.isSearching = false;
-      })
+      })  
     })
   }
 
   selectMovie(id) {
     this.apiService.getMovieDetail(id).subscribe(data => {
       this.selectedMovie = data;
-      console.log(this.movieSearhInput);
-      // this.movieSearhInput.nativeElement = "";
       this.renderer.setValue(this.movieSearhInput.nativeElement, '');
       this.listOfMovieResult = [];
       console.log(data);
+      this.apiService.getMovieCast(id).subscribe((result: any) => {
+        console.log(result);
+        this.moviecasts = result.cast;
+      });
+
+      this.apiService.getMovieTrailer(id).subscribe((trailers: any) => {
+
+        this.trailerSafeSource = undefined;
+        for (let trailer of trailers.results){
+          if(trailer.type == "Trailer") {
+            this.trailerSafeSource = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.youtube.com/embed/" + trailer.key);
+            break;
+          }
+        }
+        if (this.trailerSafeSource == undefined) {
+          this.trailerSafeSource = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.youtube.com/embed/" + trailers.results[0].key);
+        }
+      })
     })
   }
 
   getRandomMovie() {
-    this.apiService.getMovieDetail(this.getRandomInt(this.latestMovie.id)).subscribe(data => {
+    const generatedMovieId = this.getRandomInt(this.latestMovie.id);
+    this.apiService.getMovieDetail(generatedMovieId).subscribe(data => {
       this.selectedMovie = data;
-    })
+      this.apiService.getMovieCast(generatedMovieId).subscribe((result: any) => {
+        console.log(result);
+        this.moviecasts = result.cast;
+      });
+      this.apiService.getMovieTrailer(generatedMovieId).subscribe((trailers: any) => {
+
+        this.trailerSafeSource = undefined;
+        for (let trailer of trailers.results){
+          if(trailer.type == "Trailer") {
+            this.trailerSafeSource = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.youtube.com/embed/" + trailer.key);
+            break;
+          }
+        }
+        if (this.trailerSafeSource == undefined) {
+          this.trailerSafeSource = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.youtube.com/embed/" + trailers.results[0].key);
+        }
+      })
+    });
   }
 
   private getRandomInt(max) {

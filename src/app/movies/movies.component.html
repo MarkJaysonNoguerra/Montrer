@@ -16,11 +16,35 @@
             </ul>
         </div>
     </div>
-    <div class="selected-movie" *ngIf="selectedMovie">
-        <img class="movie-poster" src="https://image.tmdb.org/t/p/original/{{selectedMovie.poster_path}}" alt="No Result">
-        <h1 class="movie-name">
-            {{selectedMovie.original_title}} <span>({{selectedMovie.release_date}})</span>
-        </h1>
-        <p class="movie-overview">{{selectedMovie.overview}}</p>
+
+    <!-- Movie result grid  -->
+    <div class="flex-grid-thirds">
+        <div class="col col-poster">
+            <div class="selected-movie" *ngIf="selectedMovie">
+                <img class="movie-poster" src="https://image.tmdb.org/t/p/original/{{selectedMovie.poster_path}}" alt="No Result">
+                <h2 class="movie-name">{{selectedMovie.original_title.trim()}}</h2>
+            </div>
+        </div>
+        <div class="col">
+            <div *ngIf="selectedMovie">
+                <div *ngIf="trailerSafeSource != undefined" class="trailer-clip">
+                    <iframe [src]="trailerSafeSource" height='350' width='400' frameborder="0" allowfullscreen></iframe>
+                </div>                   
+                <h2 class="movie-name">
+                    Overview
+                </h2>
+                <p class="movie-overview">{{selectedMovie.overview}}</p> 
+            </div>
+        </div>
+        <div class="col col-cast" *ngIf="moviecasts.length > 0">
+            <h3 class="cast-header">Casts</h3>
+            <div class="casts">
+                <div class="cast" *ngFor="let cast of moviecasts">
+                    <img class="movie-cast" src="https://image.tmdb.org/t/p/original{{cast.profile_path}}" alt="No Result">
+                    <p>{{cast.original_name}}</p>    
+                    <!-- <p>{{cast.original_name}} <b>as </b> {{ cast.character }}</p>     -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
