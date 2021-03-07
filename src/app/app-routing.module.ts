@@ -6,9 +6,10 @@ import { TvSeriesComponent } from './tv-series/tv-series.component';
 
 
 const routes: Routes = [
+    { path: '', redirectTo: '/movie', pathMatch: 'full' },
     { path : "movie", component : MoviesComponent},
     { path : "tv", component : TvSeriesComponent},
-    { path : "actor", component : ActorsComponent}
+    { path : "actor", component : ActorsComponent},
 ];
 
 @NgModule ({

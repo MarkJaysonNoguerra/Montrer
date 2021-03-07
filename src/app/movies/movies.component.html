@@ -25,7 +25,7 @@
                 <h2 class="movie-name">{{selectedMovie.original_title.trim()}}</h2>
             </div>
         </div>
-        <div class="col">
+        <div class="col col-trailer">
             <div *ngIf="selectedMovie">
                 <div *ngIf="trailerSafeSource != undefined" class="trailer-clip">
                     <iframe [src]="trailerSafeSource" height='350' width='400' frameborder="0" allowfullscreen></iframe>
